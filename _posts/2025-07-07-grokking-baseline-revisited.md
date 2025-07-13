@@ -72,7 +72,7 @@ unexpected issues, some of which are likely inadvertent:
 2. [Fig. 1a experiment](https://github.com/LucasPrietoAl/grokking-at-the-edge-of-numerical-stability/issues/7)
 
     Legend of Fig. 1 indicates that the experiment for Fig. 1a is run with modified AdamW optimizer
-    ($$\perp$$AdamW) and softmax function (StableMax):
+    ($$\perp$$AdamW) and modified softmax function (StableMax):
 
     <div class="caption">
       <img src="{{ 'assets/img/2025-07-07-grokking-baseline-revisited/figure_1_crop.png' | relative_url }}" class="img-fluid" width="auto" height="auto">
@@ -81,10 +81,15 @@ unexpected issues, some of which are likely inadvertent:
     ```bash
     python grokking_experiments.py --lr 0.01 --num_epochs 300 --log_frequency 10 --device "$DEVICE" --train_fraction 0.4 --beta2 0.99 --orthogonal_gradients
     ```
-    When the same command is run with `--loss_function stablemax`, the model underperforms:
+    The model underperforms when the same command is run with `--loss_function stablemax`:
     <div class="caption">
       <img src="{{ 'assets/img/2025-07-07-grokking-baseline-revisited/pAdamW_stablemax.png' | relative_url }}" class="img-fluid" width="50%" height="auto">
     </div>
+
+3. [`betas` and `eps` are never set for $$\perp$$AdamW experiments](https://github.com/LucasPrietoAl/grokking-at-the-edge-of-numerical-stability/issues/11)
+
+    $$\perp$$AdamW runs AdamW as the `base_optimizer` after orthogonalizing the gradients, but only LR and WD coefficient are passed for its initialization.
+    Consequently, the rest of the hyperparameters always default to the PyTorch default despite obvious intention to change $$\beta_2$$ and $$\epsilon$$.
 
 Others, however, are harder to explain:
 
