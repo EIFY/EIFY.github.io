@@ -138,18 +138,25 @@ sweep the WD coefficient and compare the experiments with the best setting with 
 <div class="caption">
   <img src="{{ 'assets/img/2025-07-07-grokking-baseline-revisited/figure_15_crop.png' | relative_url }}" class="img-fluid" width="auto" height="auto">
 </div>
-While they provide no details for these experiments, WD experiments run with the most common setup
-of the main experiments (LR=0.01 and trained with 0.4 of the dataset) significantly outperform
-the ones shown in Fig. 15a:
+While Prieto et al. provide no details for these experiments, WD experiments run with the most
+common setup of the main experiments (LR=0.01 and trained with 0.4 of the dataset) significantly
+outperform the ones shown in Fig. 15a:
 
 ```bash
 #!/usr/bin/env bash
 DEVICE="cuda:0"
-for WD in 2. 4. 6. 8.
+for WD in 2. 4. 6. 8. 10.
 do
     python grokking_experiments.py --lr 0.01 --weight_decay $WD --num_epochs 1001 --log_frequency 10 --device $DEVICE --train_fraction 0.4
 done
 ```
 <div class="caption">
   <img src="{{ 'assets/img/2025-07-07-grokking-baseline-revisited/figure_15a_repro_zoom_in.png' | relative_url }}" class="img-fluid" width="50%" height="auto">
+</div>
+
+Generalization of the WD experiments can be further sped up with LR tuning so that $$\perp$$AdamW
+no longer appears favorable in comparison:
+
+<div class="caption">
+  <img src="{{ 'assets/img/2025-07-07-grokking-baseline-revisited/best_experiments.png' | relative_url }}" class="img-fluid" width="50%" height="auto">
 </div>
