@@ -32,6 +32,7 @@ toc:
 _styles: >
   r { color: Red }
   g { color: Green }
+  gr { color: Gray }
 ---
 
 ## Introduction
@@ -160,3 +161,9 @@ no longer appears favorable in comparison:
 <div class="caption">
   <img src="{{ 'assets/img/2025-07-07-grokking-baseline-revisited/best_experiments.png' | relative_url }}" class="img-fluid" width="50%" height="auto">
 </div>
+
+||No Embedding Layer|Embedding Layer|
+|:-----:|:-----:|:-----:|
+|1 Hidden Layer|917 <g>-119</g>|126 <g>-140</g>|
+|2 Hidden Layers|143 <r>+19</r>|111 <g>-87</g>|
+|3 Hidden Layers|>400 <gr>±?</gr>|146 <g>->254</g>|
