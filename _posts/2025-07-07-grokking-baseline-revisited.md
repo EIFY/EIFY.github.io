@@ -90,7 +90,7 @@ unexpected issues, some of which are likely inadvertent:
 
 3. [`betas` and `eps` are never set for $$\perp$$AdamW experiments](https://github.com/LucasPrietoAl/grokking-at-the-edge-of-numerical-stability/issues/11)
 
-    $$\perp$$AdamW runs AdamW as the `base_optimizer` after orthogonalizing the gradients, but only LR and WD coefficient are passed for its initialization.
+    $$\perp$$AdamW runs AdamW as the `base_optimizer` after orthogonalizing the gradients, but only LR and WD (weight decay) coefficient are passed for its initialization.
     Consequently, the rest of the hyperparameters always default to the PyTorch default despite obvious intention to change $$\beta_2$$ and $$\epsilon$$.
 
 Others, however, are harder to explain:
@@ -180,10 +180,21 @@ of the concatenated embedding the same as that of the hidden layers (200).</d-fo
 
 For each variation we grid-search LR $$\in \{0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1\}$$
 for both the $$\perp$$AdamW and WD experiments. For the WD experiments, we also grid-search the WD
-coefficient $$\in \{2, 4, 6, 8, 10\}$$.
+coefficient $$\in \{2, 4, 6, 8, 10\}$$. We then compare the first epoch to solve modular addition
+with $$p = 113$$ (the first epoch that the model reaches 100% accuracy on the test set) between the
+best WD experiment and the best $$\perp$$AdamW experiment for each architecture variation.
+The difference is marked <g>green</g> if the best WD experiment solves first and <r>red</r> if the
+best $$\perp$$AdamW experiment solves first. We do not train beyond 400 epochs for the 3 hidden
+layers experiments since smaller models can solve modular addition within half of the training
+budget:
 
 ||2-hot Encoding|Embedding Layer|
 |:-----:|:-----:|:-----:|
 |1 Hidden Layer|917 <g>-119</g>|126 <g>-140</g>|
 |2 Hidden Layers|143 <r>+19</r>|111 <g>-87</g>|
 |3 Hidden Layers|>400 <gr>±?</gr>|146 <g>->254</g>|
+
+We can see that $$\perp$$AdamW doesn't hold a systematic advantage over the simple WD baseline. In fact,
+it underperforms across the board with more conventional trainable embedding. We have also tested setting
+WD to 0 for the embedding layer and running the PyTorch default $$\beta_2$$ and $$\epsilon$$ for $$\perp$$AdamW
+like the original repo, but neither helps.
