@@ -40,12 +40,13 @@ First reported in <d-cite key="power2022grokkinggeneralizationoverfittingsmall">
 refers to the phenomenon of extremely delayed generalization during model training, in which the model
 reaches near-perfect accuracy on the training set orders of magnitude earlier than on the test set.
 More recently, the ICLR 2025 paper "Grokking at the Edge of Numerical Stability" (Prieto et al., 2025, <d-cite key="prieto2025grokking"></d-cite>)
-reports improved grokking performance with modified softmax function and AdamW optimizer, and people
+reports improved grokking performance with modified softmax function and AdamW optimizer <d-cite key="loshchilov2018decoupled"></d-cite>, and people
 have been benchmarking variants of Muon optimizer <d-cite key="jordan2024muon"></d-cite> against the
-the AdamW baseline on grokking experiments <d-cite key="tveit2025muonoptimizeracceleratesgrokking"></d-cite><d-cite key="cesista2025spectralclipping"></d-cite><d-cite key="EssentialAI2025muongrokking"></d-cite>.
+AdamW baseline on grokking experiments <d-cite key="tveit2025muonoptimizeracceleratesgrokking"></d-cite><d-cite key="cesista2025spectralclipping"></d-cite><d-cite key="EssentialAI2025muongrokking"></d-cite>.
 It is perhaps imperative, therefore, to double-check how well the AdamW baseline can really perform for
 these experiments. Following <d-cite key="prieto2025grokking"></d-cite>, all the experiments presented
-in this post are on the AdamW MLP baseline for modular addition: $$(a + b)\, \mathrm{mod} \, p $$ where
+in this post are on the AdamW baseline from the paper with a 2-hidden layer multi-layer perceptron
+(MLP) of width 200 for modular addition: $$(a + b)\, \mathrm{mod} \, p $$ where
 $$a, b \in [0, p), \, p = 113$$ unless specified otherwise.
 
 ## Discrepancies of Prieto et al., 2025
@@ -156,13 +157,32 @@ done
 </div>
 
 Generalization of the WD experiments can be further sped up with LR tuning so that $$\perp$$AdamW
-no longer appears favorable in comparison:
+no longer appears favorable:
 
 <div class="caption">
   <img src="{{ 'assets/img/2025-07-07-grokking-baseline-revisited/best_experiments.png' | relative_url }}" class="img-fluid" width="50%" height="auto">
 </div>
 
-||No Embedding Layer|Embedding Layer|
+For a more systematic comparison, we test architecture
+variations along two axes<d-footnote>Prieto et al.’s MLP 2-hot encodes the operands of modular addition $$a, b \in [0, p)$$ by
+concatenating their 1-hot encoding. Prieto et al. claim that this MLP is
+from <d-cite key="liu2023omnigrok"></d-cite>, which in turn claims that the setup is from
+Liu et al., 2022 <d-cite key="liu2022towards"></d-cite>. Liu et al.'s repository, however,
+shows that <a href="https://github.com/ejmichaud/grokking-squared/blob/0229df94de69b8384e560367280a43a238112bf5/toy/train_add.py#L31-L33">its toy modular addition model first adds up the embeddings of a, b before feeding the sum to the 2-hidden layer MLP</a>. In contrast, Prieto et al.’s MLP feeds the 2-hot encoding directly to the MLP so its first hidden
+layer effectively adds up the "embeddings" of a, b and the overall model has one less hidden
+layer, in addition of the difference of nonlinearity (tanh vs. ReLU) and the fact that Prieto et al.'s
+MLP applies ReLU to the sum of "embeddings" first. The architecture variations we test are motivated
+by this discrepancy and the dimension of the trainable embeddings is set to 100 to keep the dimension
+of the concatenated embedding the same as that of the hidden layers (200).</d-footnote>:
+
+1. Number of hidden layers $$\in \{1, 2, 3\}$$
+2. Trainable embedding layer instead of 2-hot encoding for the operands $$a, b$$
+
+For each variation we grid-search LR $$\in \{0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1\}$$
+for both the $$\perp$$AdamW and WD experiments. For the WD experiments, we also grid-search the WD
+coefficient $$\in \{2, 4, 6, 8, 10\}$$.
+
+||2-hot Encoding|Embedding Layer|
 |:-----:|:-----:|:-----:|
 |1 Hidden Layer|917 <g>-119</g>|126 <g>-140</g>|
 |2 Hidden Layers|143 <r>+19</r>|111 <g>-87</g>|
