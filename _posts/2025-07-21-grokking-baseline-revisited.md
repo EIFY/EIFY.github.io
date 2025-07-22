@@ -217,11 +217,13 @@ To recap, one way to measure the model's robustness is to measure the Lipschitz 
 $$||f(x) - f(y)|| \leq L||x - y||$$
 > for some norm $||\cdot||$ chosen a priori.
 
-For a 2-hidden layer MLP that takes the concatenation of two 113-dim embeddings as the input and outputs
-the 113-dim logit, $n = 226$ and $m = 113$. If we pick L2 norm $||\cdot||_2$ as the norm of choice,
-activation functions such as ReLU and GELU are 1-Lipschitz, so the product of the spectral norms of
-the 3 linear layers constitutes a upper bound of the Lipschitz constant $L$ where the spectral norm of
-a linear transformation $M$ is its largest singular value:
+Smaller Lipschitz constant means that the model is less sensitive to input perturbation, therefore
+can be considered more robust. In our case of a 2-hidden layer MLP that takes the concatenation of
+two 113-dim embeddings as the input and outputs the 113-dim logit, $n = 226$ and $m = 113$. With L2
+norm $||\cdot||_2$ as the norm of choice and 1-Lipschitz functions such as ReLU or GELU as the
+activation function, the product of the spectral norms of the 3 linear layers constitutes a upper
+bound of the Lipschitz constant $L$ where the spectral norm of a linear transformation $M$ is its
+largest singular value:
 
 $$||M||_2 = \max_{x \neq 0} \frac{||Mx||_2}{||x||_2}$$
 
