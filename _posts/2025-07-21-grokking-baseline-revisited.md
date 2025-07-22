@@ -217,7 +217,7 @@ To recap, one way to measure the model's robustness is to measure the Lipschitz 
 $$||f(x) - f(y)|| \leq L||x - y||$$
 > for some norm $||\cdot||$ chosen a priori.
 
-Smaller Lipschitz constant means that the model is less sensitive to input perturbation, therefore
+Smaller Lipschitz constant $L$ means that the model is less sensitive to input perturbation, therefore
 can be considered more robust. In our case of a 2-hidden layer MLP that takes the concatenation of
 two 113-dim embeddings as the input and outputs the 113-dim logit, $n = 226$ and $m = 113$. With L2
 norm $||\cdot||_2$ as the norm of choice and 1-Lipschitz functions such as ReLU or GELU as the
@@ -250,7 +250,7 @@ Lipschitz upper bound. Switching from GELU to ReLU doesn't change the result sig
 Inline with <d-cite key="EssentialAI2025muongrokking"></d-cite>, we find that AdamW with tuned LR and
 WD coefficient to be a strong baseline for the task of modular addition and multiplication in comparison
 to modified $$\perp$$AdamW and variants of Muon. In fact, with the tasks solved within 150 epochs,
-perhaps it is imperative to question whether such training dynamics should still be called "grokking"
+perhaps we should question whether such training dynamics should still be called "grokking"
 and whether other common grokking tasks can be similarly solved efficiently with tuned LR and WD. To
 the extent that it is still relevant, the AdamW baseline for grokking may be hard to improve upon
 significantly.
